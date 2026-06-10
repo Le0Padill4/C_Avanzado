@@ -1,0 +1,720 @@
+================================================================
+   TALLER — ENCAPSULAMIENTO, GETTERS Y SETTERS EN C++
+   Universidad San Francisco de Quito — USFQ
+   Curso: Programación Avanzada en C++
+   Duración: 30 minutos
+
+   Nombre: Leonardo Padilla
+   Fecha:  09/05/2026
+================================================================
+
+
+╔══════════════════════════════════════════════════════════════╗
+║   BLOQUE 1 — EL PROBLEMA  (5 minutos)                      ║
+╚══════════════════════════════════════════════════════════════╝
+
+Lee este código y observa el problema:
+
+  class Estudiante {
+  public:
+      string nombre;
+      double nota;
+      int edad;
+  };
+
+  int main() {
+      Estudiante e;
+      e.nombre = "Ana";
+      e.nota   = 150.0;   // ← una nota de 150 sobre 100
+      e.edad   = -5;      // ← una edad negativa
+      return 0;
+  }
+
+Este código COMPILA Y EJECUTA sin ningún error.
+El programa acepta nota=150 y edad=-5 sin quejarse.
+
+El problema es que no existe una validación de los datos que se ingresan para e.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PREGUNTA DE REFLEXIÓN — responde antes de continuar:
+
+  ¿Qué consecuencias tendría en un sistema real que
+  un estudiante pueda tener nota=150 o edad=-5?
+  ¿Quién debería ser responsable de validar esos datos?
+
+  Tu respuesta:
+El problema esta en que existiría una incongruencia en los datos ingresados,
+El setter debería ser responsable de validar los datos
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+El problema es que con todo public, CUALQUIER código externo
+puede modificar los datos del objeto sin ningún control.
+El objeto no puede defenderse.
+
+La solución: ENCAPSULAMIENTO.
+
+
+╔══════════════════════════════════════════════════════════════╗
+║   BLOQUE 2 — CONCEPTO  (10 minutos)                        ║
+╚══════════════════════════════════════════════════════════════╝
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+¿QUÉ ES EL ENCAPSULAMIENTO?
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Encapsulamiento significa ocultar los datos internos de un
+objeto y controlar cómo se accede a ellos desde afuera.
+
+  Analogía: piensa en un cajero automático.
+  No puedes meter la mano al cajero y tomar el dinero
+  directamente — debes usar la interfaz (los botones).
+  La interfaz valida tu PIN, tu saldo, el monto máximo.
+  Los datos internos están PROTEGIDOS y solo se accede
+  a ellos de forma controlada.
+
+  El objeto es el cajero.
+  Los atributos privados son el dinero adentro.
+  Los getters y setters son los botones del menú.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PRIVATE Y PUBLIC
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  private:
+    Los atributos marcados private solo pueden ser leídos
+    o modificados desde DENTRO de la misma clase.
+    Ningún código externo puede acceder directamente.
+
+  public:
+    Los métodos marcados public son la INTERFAZ del objeto:
+    lo que el mundo exterior puede usar.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+CONSTRUCTOR Y ENCAPSULAMIENTO — primera línea de defensa
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+El constructor es el primer método que se ejecuta cuando
+se crea un objeto. Es la PRIMERA OPORTUNIDAD de garantizar
+que el objeto nazca en un estado válido.
+
+  Relación entre constructor y encapsulamiento:
+
+  CONSTRUCTOR → garantiza que el objeto NACE con datos válidos.
+  SETTER      → garantiza que los datos se MANTIENEN válidos
+                durante la vida del objeto.
+
+  Son complementarios — ambos defienden al objeto, pero
+  en momentos distintos:
+
+  Momento de creación:    Constructor valida los datos iniciales.
+  Momento de modificación: Setter valida los cambios posteriores.
+
+  Sin constructor que valide, un objeto puede nacer corrupto
+  aunque tengas setters perfectos.
+  Sin setters que validen, un objeto puede corromperse después
+  de nacer aunque el constructor sea perfecto.
+  Con ambos: el objeto siempre está en estado válido.
+
+  Ejemplo que muestra la relación:
+
+  class Producto {
+  private:
+      string nombre;
+      double precio;
+
+  public:
+      // Constructor: valida al nacer
+      Producto(string n, double p) : nombre(n) {
+          precio = (p >= 0) ? p : 0;  // nace con precio válido
+      }
+
+      // Setter: valida al modificar después de nacer
+      void setPrecio(double p) {
+          if (p >= 0) {
+              precio = p;
+          } else {
+              cout << "Precio invalido." << endl;
+          }
+      }
+
+      double getPrecio() const { return precio; }
+  };
+
+  int main() {
+      Producto p1("Laptop", 1000.0);   // nace con precio 1000
+      Producto p2("Cable",  -50.0);    // nace con precio 0 (no -50)
+
+      p1.setPrecio(1200.0);   // cambia a 1200 — válido
+      p1.setPrecio(-100.0);   // rechazado — siempre >= 0
+  }
+
+  NOTA: en el constructor usamos lista de inicialización
+  (: nombre(n)) para inicializar nombre directamente.
+  Para precio usamos el cuerpo porque necesitamos validar.
+  Ambas formas son correctas — la lista es más eficiente
+  para atributos que no necesitan validación.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+GETTERS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Un getter es un método public que permite LEER un atributo
+privado desde fuera de la clase.
+
+  Convención de nombre: get + NombreAtributo
+  Siempre se declara const — el objeto no cambia al leer.
+  Siempre retorna el tipo del atributo que expone.
+
+  const al final del método es una PROMESA al compilador:
+  "este método no modifica ningún atributo del objeto."
+  Si intentas modificar algo dentro, el compilador lanza error.
+
+  class Temperatura {
+  private:
+      double celsius;
+
+  public:
+      Temperatura(double c) : celsius(c) {}
+
+      // Getter const: solo lee
+      double getCelsius() const {
+          return celsius;
+      }
+
+      // También puede calcular sin modificar — sigue siendo const
+      double getFahrenheit() const {
+          return celsius * 9.0 / 5.0 + 32.0;
+      }
+  };
+
+  Temperatura t(100.0);
+  cout << t.getCelsius();     // 100.0  — OK
+  cout << t.getFahrenheit();  // 212.0  — OK
+  // t.celsius = 50;          // ERROR: celsius es private
+
+  ¿Qué pasa si un atributo NO tiene getter?
+  Significa que ese dato es completamente interno —
+  nadie afuera necesita conocerlo. Es encapsulamiento total.
+  No todo atributo privado necesita getter.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SETTERS — con y sin validación
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Un setter es un método public que permite MODIFICAR un
+atributo privado. Su valor está en la VALIDACIÓN.
+
+Compara estas dos versiones:
+
+  // [MAL] Setter sin validación — no aporta nada sobre public
+  void setNota(double n) {
+      nota = n;   // acepta cualquier cosa, igual que nota = n
+  }               // en este caso mejor dejar nota public
+
+  // [BIEN] Setter con validación — esto sí justifica encapsular
+  void setNota(double n) {
+      if (n >= 0.0 && n <= 100.0) {
+          nota = n;
+      } else {
+          cout << "Nota invalida. Rango: 0 a 100." << endl;
+      }
+  }
+
+  La diferencia: el setter con validación PROTEGE al objeto.
+  Si el setter no valida, private + setter es equivalente
+  a simplemente declarar el atributo public. No tiene sentido.
+
+  REGLA:
+    Si tienes setter → SIEMPRE debe validar.
+    Si no necesitas validar → considera si realmente necesitas
+    encapsular ese atributo o si puede ser public.
+
+  La clase completa con constructor + getter + setter:
+
+  class Estudiante {
+  private:
+      string nombre;
+      double nota;
+
+  public:
+      // Constructor: primera línea de defensa
+      Estudiante(string n, double nota_inicial) : nombre(n) {
+          nota = (nota_inicial >= 0 && nota_inicial <= 100)
+                 ? nota_inicial : 0;
+      }
+
+      // Getter: acceso de lectura
+      string getNombre() const { return nombre; }
+      double getNota()   const { return nota;   }
+
+      // Setter: acceso de escritura con validación
+      void setNota(double n) {
+          if (n >= 0.0 && n <= 100.0) {
+              nota = n;
+          } else {
+              cout << "Nota invalida." << endl;
+          }
+      }
+  };
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+const EN EL MÉTODO — qué significa exactamente
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  NOTA: esta sección usa conceptos de punteros para explicar
+  cómo funciona const internamente. Si todavía no conoces
+  punteros, lee la REGLA FINAL al final de esta sección y
+  regresa aquí cuando hayas visto punteros. El taller
+  funciona perfectamente sin entender esta parte en detalle.
+
+Para entender const en un método, primero necesitas entender
+qué es this.
+
+¿QUÉ ES this?
+─────────────
+Cuando llamas un método de un objeto, C++ pasa
+automáticamente un puntero especial llamado this que
+apunta al objeto que está llamando al método.
+
+  class Estudiante {
+  private:
+      double nota;
+  public:
+      Estudiante(double n) : nota(n) {}  // constructor
+
+      double getNota() {
+          return nota;          // C++ lee esto como:
+          // return this->nota; // ← this apunta al objeto actual
+      }
+  };
+
+  Estudiante e(85.0);
+  e.getNota();   // dentro del método, this == &e
+
+this siempre existe aunque no lo escribas.
+Es el mecanismo interno que conecta el método con el
+objeto específico que lo llamó. Sin this, el método no
+sabría de qué objeto leer los atributos.
+
+¿QUÉ HACE const EN EL MÉTODO?
+──────────────────────────────
+Cuando escribes const al final de un método, lo único
+que C++ hace internamente es cambiar el tipo de this:
+
+  // Método SIN const:
+  double getNota() {
+      // this es:  Estudiante*          ← puntero normal
+      // puede leer Y modificar atributos
+  }
+
+  // Método CON const:
+  double getNota() const {
+      // this es:  const Estudiante*    ← puntero a objeto constante
+      // puede leer atributos
+      // NO puede modificar atributos
+  }
+
+Eso es literalmente todo. const en el método convierte
+this de puntero normal a puntero a objeto constante.
+Y como this apunta a un objeto constante, el compilador
+bloquea cualquier intento de modificar atributos a través de él.
+
+¿POR QUÉ EL COMPILADOR DETECTA EL ERROR?
+──────────────────────────────────────────
+Si dentro de un método const intentas modificar un atributo:
+
+  double getNota() const {
+      nota = 0;      // el compilador intenta: this->nota = 0
+      return nota;   // pero this es const Estudiante*
+  }                  // → ERROR: no puedes modificar un objeto const
+
+El error ocurre en COMPILACIÓN, antes de ejecutar.
+El mensaje típico en g++ es:
+  error: assignment of member 'Estudiante::nota'
+  in read-only object
+
+¿POR QUÉ const VA EN EL MÉTODO Y NO EN EL ATRIBUTO?
+─────────────────────────────────────────────────────
+Porque son promesas distintas:
+
+  const en un ATRIBUTO → ese dato específico nunca cambia:
+    const int MAX = 100;  // MAX siempre vale 100
+
+  const en un MÉTODO → el objeto completo no cambia al
+  ejecutar ese método. No importa cuántos atributos lea —
+  si ninguno cambia, el método puede ser const.
+
+  void imprimir() const {
+      // lee nombre, nota Y edad — los tres quedan intactos
+      cout << nombre << " " << nota << " " << edad << endl;
+  }
+  // Un solo const protege los tres atributos a la vez
+
+CONSECUENCIA PRÁCTICA — objetos const:
+────────────────────────────────────────
+A veces quieres crear un objeto que no debe cambiar nunca
+después de crearse. Por ejemplo: una tabla de impuestos,
+una constante de configuración, o un registro histórico
+que no debe modificarse.
+
+Para eso declaras el objeto como const:
+
+  const Caja cajaFija(99);   // este objeto no puede cambiar
+
+Cuando tienes un objeto const, el compilador solo te permite
+llamar métodos que también sean const. Tiene sentido: si el
+objeto prometió no cambiar, no puede llamar métodos que
+potencialmente lo modifiquen.
+
+  class Caja {
+  private:
+      int contenido;
+  public:
+      Caja(int c) : contenido(c) {}
+      int  getContenido() const  { return contenido; }
+      void setContenido(int c)   { contenido = c;    }
+  };
+
+  const Caja cajaFija(99);         // objeto constante
+
+  cajaFija.getContenido();         // OK — método es const
+  cajaFija.setContenido(50);       // ERROR — método no es const
+
+¿Por qué? cajaFija es const Caja. Al llamar setContenido,
+C++ intenta pasar this como const Caja* al método. Pero
+setContenido espera Caja* (sin const) porque puede modificar.
+Tipos incompatibles → el compilador bloquea la llamada.
+
+EJEMPLO COMPLETO — con y sin const:
+
+  #include <iostream>
+  using namespace std;
+
+  class Caja {
+  private:
+      int contenido;
+  public:
+      Caja(int c) : contenido(c) {}
+
+      // const → this es const Caja* → solo puede leer
+      int getContenido() const {
+          return contenido;           // leer: permitido
+          // contenido = 0;           // modificar: ERROR
+      }
+
+      // sin const → this es Caja* → puede leer y escribir
+      void setContenido(int c) {
+          contenido = c;              // modificar: permitido
+      }
+  };
+
+  int main() {
+      Caja caja(42);
+      cout << caja.getContenido() << endl;  // 42
+      caja.setContenido(100);
+      cout << caja.getContenido() << endl;  // 100
+
+      const Caja cajaFija(99);
+      cout << cajaFija.getContenido() << endl;  // 99 — OK
+      // cajaFija.setContenido(50);             // ERROR
+      return 0;
+  }
+
+REGLA FINAL:
+  Todo método que solo LEE atributos  → márcalo const
+  Todo método que MODIFICA atributos  → no lleva const
+
+  Ejemplos de este taller:
+    getNota()        → const  (solo retorna nota)
+    getFahrenheit()  → const  (calcula sin modificar celsius)
+    imprimir()       → const  (solo lee para mostrar)
+    setNota()        → sin const (modifica nota)
+    depositar()      → sin const (modifica saldo)
+    retirar()        → sin const (modifica saldo)
+
+
+╔══════════════════════════════════════════════════════════════╗
+║   BLOQUE 3 — EJEMPLO RESUELTO  (7 minutos)                 ║
+╚══════════════════════════════════════════════════════════════╝
+
+Lee el programa completo. Observa cómo constructor, getters
+y setters trabajan juntos para mantener el objeto válido.
+
+─────────────────────────────────────────────────────────────
+  #include <iostream>
+  #include <iomanip>
+  using namespace std;
+
+  class CuentaBancaria {
+  private:
+      string titular;
+      double saldo;
+
+  public:
+      // Constructor: el objeto nace con estado válido
+      // Lista de inicialización para titular (no necesita validación)
+      // Cuerpo para saldo (necesita validar que no sea negativo)
+      CuentaBancaria(string t, double s) : titular(t) {
+          saldo = (s >= 0) ? s : 0;
+      }
+
+      // GETTERS — solo leen, no modifican (const)
+      double getSaldo()   const { return saldo;   }
+      string getTitular() const { return titular; }
+
+      // SETTER con lógica: valida que el monto sea positivo
+      void depositar(double monto) {
+          if (monto > 0) {
+              saldo += monto;
+              cout << "Deposito exitoso. Saldo: $"
+                   << fixed << setprecision(2) << saldo << endl;
+          } else {
+              cout << "Error: el monto debe ser positivo." << endl;
+          }
+      }
+
+      // SETTER con lógica: valida saldo suficiente y monto positivo
+      void retirar(double monto) {
+          if (monto <= 0) {
+              cout << "Error: el monto debe ser positivo." << endl;
+          } else if (monto > saldo) {
+              cout << "Error: saldo insuficiente." << endl;
+          } else {
+              saldo -= monto;
+              cout << "Retiro exitoso. Saldo: $"
+                   << fixed << setprecision(2) << saldo << endl;
+          }
+      }
+
+      void imprimir() const {
+          cout << "Titular: " << titular << endl;
+          cout << "Saldo:   $"
+               << fixed << setprecision(2) << saldo << endl;
+      }
+  };
+
+  int main() {
+      CuentaBancaria cuenta("Ana Torres", 500.0);
+
+      cuenta.imprimir();
+      cuenta.depositar(200.0);
+      cuenta.retirar(100.0);
+      cuenta.retirar(800.0);    // debe rechazarse
+      cuenta.depositar(-50.0);  // debe rechazarse
+
+      cout << "Saldo final: $"
+           << fixed << setprecision(2)
+           << cuenta.getSaldo() << endl;
+      return 0;
+  }
+─────────────────────────────────────────────────────────────
+
+Salida del programa:
+  Titular: Ana Torres
+  Saldo:   $500.00
+  Deposito exitoso. Saldo: $700.00
+  Retiro exitoso. Saldo: $600.00
+  Error: saldo insuficiente.
+  Error: el monto debe ser positivo.
+  Saldo final: $600.00
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+OBSERVA EN EL EJEMPLO — las tres capas de defensa:
+
+  CAPA 1 — Constructor:
+    saldo = (s >= 0) ? s : 0
+    Si alguien crea CuentaBancaria("X", -500), el saldo
+    queda en 0. El objeto nace válido.
+
+  CAPA 2 — Setters con validación:
+    depositar() rechaza montos negativos o cero.
+    retirar() rechaza montos que superen el saldo.
+    El objeto se mantiene válido después de nacer.
+
+  CAPA 3 — Atributos private:
+    Nadie puede escribir cuenta.saldo = -9999 desde main.
+    La única forma de modificar saldo es a través de los
+    métodos públicos, que siempre validan.
+
+  Las tres capas juntas garantizan que saldo NUNCA
+  puede ser negativo — ni al crear ni al modificar.
+
+
+╔══════════════════════════════════════════════════════════════╗
+║   BLOQUE 4 — EJERCICIO  (8 minutos)                        ║
+╚══════════════════════════════════════════════════════════════╝
+
+Implementa la clase Estudiante con encapsulamiento correcto.
+
+ESPECIFICACIONES:
+
+  Atributos (todos PRIVATE):
+    string nombre    → nombre del estudiante
+    double nota      → valor entre 0.0 y 100.0
+    int    edad      → valor entre 1 y 120
+
+  Constructor:
+    Estudiante(string n, double nota_ini, int edad_ini)
+    → usa lista de inicialización para nombre:
+       Estudiante(string n, ...) : nombre(n) { ... }
+       (la lista de inicialización va entre ) y { con dos puntos)
+    → valida nota en el cuerpo:
+       si está fuera de [0,100] inicializa en 0
+    → valida edad en el cuerpo:
+       si está fuera de [1,120] inicializa en 0
+
+  Getters (todos const):
+    string getNombre() const
+    double getNota()   const
+    int    getEdad()   const
+
+  Setters con validación:
+    void setNota(double n)
+      → acepta solo si n está entre 0.0 y 100.0
+      → si no, imprime: "Nota invalida."
+      → si sí, imprime: "Nota actualizada: X"
+
+    void setEdad(int e)
+      → acepta solo si e está entre 1 y 120
+      → si no, imprime: "Edad invalida."
+      → si sí, imprime: "Edad actualizada: X"
+
+  Método:
+    void imprimir() const
+      → imprime:
+        Nombre: [nombre]
+        Nota  : [nota con 2 decimales]
+        Edad  : [edad]
+
+El main ya está escrito — solo implementa la clase:
+
+  int main() {
+      Estudiante e("Luis", 85.0, 22);
+      e.imprimir();
+
+      e.setNota(150.0);   // debe rechazarse
+      e.setNota(91.5);    // debe aceptarse
+      e.setEdad(-3);      // debe rechazarse
+      e.setEdad(23);      // debe aceptarse
+
+      cout << "Nota final : "
+           << fixed << setprecision(2)
+           << e.getNota() << endl;
+      cout << "Edad final : " << e.getEdad() << endl;
+      return 0;
+  }
+
+Salida esperada:
+  Nombre: Luis
+  Nota  : 85.00
+  Edad  : 22
+  Nota invalida.
+  Nota actualizada: 91.50
+  Edad invalida.
+  Edad actualizada: 23
+  Nota final : 91.50
+  Edad final : 23
+
+Tu implementación de la clase:
+
+Class Estudiante{
+Private: 
+  String nombre;
+  Double nota;
+  Int edad;
+
+Public:
+  Estudiante(std::string n, double nota, int edad) : nombre(n) {
+        if (nota_ini >= 0.0 && nota_ini <= 100.0) {
+            nota = nota_ini;
+        } else {
+            nota = 0;
+        }
+}        if (edad_ini >= 1 && edad_ini <= 120) {
+            edad = edad_ini;
+        } else {
+            edad = 0;
+        }
+    }
+
+    std::string getNombre() const {
+        return nombre;
+    }
+
+    double getNota() const {
+        return nota;
+    }
+
+    int getEdad() const {
+        return edad;
+    }
+
+    void setNota(double n) {
+        if (n >= 0.0 && n <= 100.0) {
+            nota = n;
+            std::cout << "Nota actualizada: "
+                      << std::fixed << std::setprecision(2)
+                      << nota << std::endl;
+        } else {
+            std::cout << "Nota invalida." << std::endl;
+        }
+    }
+
+    void setEdad(int e) {
+        if (e >= 1 && e <= 120) {
+            edad = e;
+            std::cout << "Edad actualizada: " << edad << std::endl;
+        } else {
+            std::cout << "Edad invalida." << std::endl;
+        }
+    }
+
+    void imprimir() const {
+        std::cout << "Nombre: " << nombre << std::endl;
+        std::cout << "Nota  : "
+                  << std::fixed << std::setprecision(2)
+                  << nota << std::endl;
+        std::cout << "Edad  : " << edad << std::endl;
+    }
+};
+};
+
+
+╔══════════════════════════════════════════════════════════════╗
+║   BLOQUE 5 — CHECKPOINT  (3 minutos)                       ║
+╚══════════════════════════════════════════════════════════════╝
+
+Responde con tus propias palabras — sin releer el taller.
+
+C1a. ¿Qué hace un getter? ¿Qué tipo de datos retorna?
+Un getter te permite obtener o consultar los datos sin modificarlo
+O acceder a el. Los datos que retorna son los mismos que tienen
+
+C1b. ¿Por qué se declara const?
+Para que el getter solo lea el valor y no modificarlo
+
+C1c. ¿Qué pasa si dentro de un getter marcado const
+     intentas modificar un atributo?
+Error
+
+C2. ¿Cuál es la diferencia entre un setter con validación
+    y uno sin validación? ¿Por qué un setter sin validación
+    no tiene sentido si el atributo es private?
+Un setter con validación revisa los valores antes de guardarlos 
+Y uno sin validación solamente los cambia, si el atributo es private
+Y el setter acepta cualquier cambio entonces no tiene mucho sentido
+
+C3. Explica la relación entre el constructor y los setters
+    en el contexto del encapsulamiento.
+    ¿En qué momento actúa cada uno?
+    ¿Qué ocurre si tienes setters perfectos pero
+    el constructor no valida?
+El constructor actua en el nacimiento del objeto y el setter actua
+Luego.
+Si el constructor no valida quiere decir que el objeto pudo haber nacido 
+Con atributos invalidos.
+
+
+================================================================
+FIN DEL TALLER
+================================================================
