@@ -439,25 +439,23 @@ por qué — dice: "las dos funciones hacen cosas distintas,
      el mecanismo técnico que usa el compilador para
      distinguir funciones sobrecargadas y por qué ese
      mecanismo falla aquí.
-     ________________________________________________________
-     ________________________________________________________
-     ________________________________________________________
+     Porque tienen los mismos parametros y no sabe cual escoger al haber dos funciones con los mismos parametros y diferente utiidad.
+
 
   b) (3 pts) El estudiante quería implementar lo que
      describió: área de cuadrado y área de rectángulo.
      Escribe la versión CORRECTA de la clase que logra
      exactamente eso usando sobrecarga válida.
 
-     class Calculadora {
-     public:
-
-
-
-
-
-
-
-     };
+  class Calculadora {
+  public:
+      double calcularArea(double lado) {
+          return lado * lado;
+      }
+      double calcularArea(double lado, double base) {
+          return lado * base;
+      }
+  };
      (si necesitas más espacio usa el reverso de la hoja)
 
   c) (2 pts) Hay un segundo error lógico en la segunda
@@ -465,16 +463,13 @@ por qué — dice: "las dos funciones hacen cosas distintas,
      Incluso si el compilador la aceptara, no calcula el
      área de un rectángulo correctamente.
      ¿Cuál es ese error? ¿Qué debería retornar?
-     ________________________________________________________
-     ________________________________________________________
-
+El error logico es que esa no es la forma de calcular el area de un rectangulo, por lo que retorna el lado*2, deberia retornar base*altura
   d) (2 pts) El tipo de retorno de las dos funciones es
      double en ambos casos. ¿Podría el compilador usar el
      tipo de retorno para distinguirlas si fuera diferente
      — por ejemplo una retorna double y la otra int?
      Justifica.
-     ________________________________________________________
-     ________________________________________________________
+Si, al ser C++ un lenguaje de tipado fuerte y estatico los puede diferenciar
 
 ════════════════════════════════════════════════════════════════
   PUNTO EXTRA 2 — ESTRUCTURAS DE DATOS Y BIG O     (+10 pts)
