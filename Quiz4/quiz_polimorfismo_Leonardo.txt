@@ -1,0 +1,644 @@
+================================================================
+   QUIZ — POLIMORFISMO EN C++
+   Universidad San Francisco de Quito — USFQ
+   Programación Avanzada en C++
+
+   Nombre: _________________________________________
+   Fecha:  _________________________________________
+   Nota:   _______ / 100
+
+   "El código que no entiendes no es tuyo."
+
+   ─────────────────────────────────────────────────
+   PARTE 1 (SIN IDE):  cerrar computadora ahora
+   PARTE 2 (CON IDE):  abrir IDE al indicar el profesor
+   ─────────────────────────────────────────────────
+
+   Tiempo total: 60 minutos
+     Parte 1 — Opción múltiple:  30 min   (49 pts)
+     Parte 2 — Implementación:   30 min   (51 pts)
+================================================================
+
+
+╔══════════════════════════════════════════════════════════════╗
+║  PARTE 1 — OPCIÓN MÚLTIPLE             (SIN IDE)  49 pts   ║
+║  14 preguntas · 3.5 pts c/u · Una sola respuesta correcta  ║
+╚══════════════════════════════════════════════════════════════╝
+
+Instrucciones (solo para esta parte):
+  - Escribe la letra de tu respuesta en la línea "Respuesta: ___"
+  - No hay penalización por respuesta incorrecta.
+  - Si el código no compilara, la respuesta correcta ya lo
+    indica explícitamente como opción — elige esa opción.
+  - TRABAJA A MANO — el IDE no ayuda aquí.
+  - Cada pregunta vale 3.5 puntos.
+
+────────────────────────────────────────────────────────────────
+Q1. (3.5 pts) ¿Qué imprime este programa?
+
+  #include <iostream>
+  using namespace std;
+
+  class Animal {
+  public:
+      void hablar() { cout << "..." << endl; }
+  };
+
+  class Perro : public Animal {
+  public:
+      void hablar() { cout << "Guau" << endl; }
+  };
+
+  void probar(Animal a) {
+      a.hablar();
+  }
+
+  int main() {
+      Perro p;
+      probar(p);
+      return 0;
+  }
+
+  A) Guau
+  B) ...
+  C) Error de compilación
+  D) Comportamiento indefinido
+
+  Respuesta: ...
+
+────────────────────────────────────────────────────────────────
+Q2. (3.5 pts) Se agrega virtual a hablar() en Animal.
+    ¿Qué imprime ahora el mismo programa de Q1?
+
+  class Animal {
+  public:
+      virtual void hablar() { cout << "..." << endl; }
+  };
+  // resto igual que Q1
+
+  A) Guau
+  B) ...
+  C) Error de compilación
+  D) Comportamiento indefinido
+
+  Respuesta: A
+
+  ¿Por qué cambia (o no cambia) la respuesta respecto a Q1?
+  Cambia la respuesta por el virtual ya que le da polimorfismo a la clase
+
+────────────────────────────────────────────────────────────────
+Q3. (3.5 pts) ¿Qué imprime este programa?
+
+  #include <iostream>
+  using namespace std;
+
+  class Figura {
+  public:
+      virtual void dibujar() { cout << "Figura" << endl; }
+      virtual ~Figura() {}
+  };
+
+  class Circulo : public Figura {
+  public:
+      void dibujar() override { cout << "Circulo" << endl; }
+  };
+
+  class Cuadrado : public Figura {
+  public:
+      void dibujar() override { cout << "Cuadrado" << endl; }
+  };
+
+  int main() {
+      Figura* formas[3];
+      formas[0] = new Circulo();
+      formas[1] = new Cuadrado();
+      formas[2] = new Circulo();
+
+      for (int i = 0; i < 3; i++) {
+          formas[i]->dibujar();
+          delete formas[i];
+          formas[i] = nullptr;
+      }
+      return 0;
+  }
+
+  A) Figura / Figura / Figura
+  B) Circulo / Cuadrado / Circulo
+  C) Error de compilación — Figura* no puede apuntar a Circulo
+  D) Comportamiento indefinido — delete en bucle
+
+  Respuesta: B
+
+────────────────────────────────────────────────────────────────
+Q4. (3.5 pts) ¿Qué ocurre al ejecutar este programa?
+
+  #include <iostream>
+  using namespace std;
+
+  class Base {
+  public:
+      Base()  { cout << "Base()"  << endl; }
+      ~Base() { cout << "~Base()" << endl; }
+  };
+
+  class Hija : public Base {
+  public:
+      Hija()  { cout << "Hija()"  << endl; }
+      ~Hija() { cout << "~Hija()" << endl; }
+  };
+
+  int main() {
+      Base* obj = new Hija();
+      delete obj;
+      return 0;
+  }
+
+  A) Imprime: Base() / Hija() / ~Hija() / ~Base()
+  B) Imprime: Base() / Hija() / ~Base()
+  C) Imprime: Base() / Hija() / ~Hija()
+  D) Error de compilación
+
+  Respuesta: A
+
+────────────────────────────────────────────────────────────────
+Q5. (3.5 pts) ¿Cuál es el problema en este código?
+
+  #include <iostream>
+  using namespace std;
+
+  class Instrumento {
+  public:
+      virtual void tocar() = 0;
+  };
+
+  class Guitarra : public Instrumento {
+  public:
+      void tocar() override {
+          cout << "Tañe las cuerdas" << endl;
+      }
+  };
+
+  class Piano : public Instrumento {
+      // No implementa tocar()
+  };
+
+  int main() {
+      Instrumento* i1 = new Guitarra();
+      Instrumento* i2 = new Piano();
+      i1->tocar();
+      i2->tocar();
+      delete i1; delete i2;
+      return 0;
+  }
+
+  A) Funciona correctamente — Piano hereda tocar() de Instrumento
+  B) Error: no se puede instanciar Piano porque no implementó
+     el método virtual puro
+  C) Error: Guitarra no puede usar override en un método puro
+  D) Error de enlazado — Instrumento no tiene cuerpo en tocar()
+
+  Respuesta: D
+
+────────────────────────────────────────────────────────────────
+Q6. (3.5 pts) ¿Qué imprime este programa?
+
+  #include <iostream>
+  using namespace std;
+
+  class A {
+  public:
+      virtual void f() { cout << "A" << endl; }
+  };
+
+  class B : public A {
+  public:
+      void f() override { cout << "B" << endl; }
+  };
+
+  class C : public B {
+  public:
+      void f() override { cout << "C" << endl; }
+  };
+
+  void llamar(A& obj) {
+      obj.f();
+  }
+
+  int main() {
+      C c;
+      B b;
+      A a;
+
+      llamar(c);
+      llamar(b);
+      llamar(a);
+      return 0;
+  }
+
+  A) A / B / C
+  B) C / B / A
+  C) A / A / A
+  D) Error — C no puede pasarse donde se espera A&
+
+  Respuesta: B
+
+────────────────────────────────────────────────────────────────
+Q7. (3.5 pts) ¿Qué retorna dynamic_cast en la línea marcada?
+
+  #include <iostream>
+  using namespace std;
+
+  class Animal {
+  public:
+      virtual ~Animal() {}
+  };
+
+  class Perro : public Animal {
+  public:
+      void ladrar() { cout << "Guau" << endl; }
+  };
+
+  class Gato : public Animal {};
+
+  int main() {
+      Animal* a = new Gato();
+
+      Perro* p = dynamic_cast<Perro*>(a);   // ← esta línea
+
+      if (p != nullptr) p->ladrar();
+      else cout << "Cast fallido" << endl;
+
+      delete a;
+      return 0;
+  }
+
+  A) Un puntero válido a Perro — imprime "Guau"
+  B) nullptr — imprime "Cast fallido"
+  C) Error de compilación — no se puede hacer downcast
+  D) Comportamiento indefinido — a apunta a Gato, no a Perro
+
+  Respuesta: A
+
+────────────────────────────────────────────────────────────────
+Q8. (3.5 pts) ¿Cuál de estas afirmaciones sobre override es FALSA?
+
+  A) override garantiza que el método existe en la clase base
+     — si no existe, el compilador da error
+
+  B) override puede usarse aunque el método de la base
+     no sea virtual — el compilador acepta ambas versiones
+
+  C) Un método marcado con override hereda automáticamente
+     la característica virtual — sus hijas también pueden
+     sobrescribirlo sin necesidad de escribir virtual de nuevo
+
+  D) Sin override, un error de tipeo en el nombre del método
+     crea un método nuevo en lugar de sobrescribir — sin
+     ningún mensaje de error
+
+  Respuesta: C
+
+────────────────────────────────────────────────────────────────
+Q9. (3.5 pts) ¿Qué imprime este programa?
+
+  #include <iostream>
+  using namespace std;
+
+  class Vehiculo {
+  public:
+      string marca;
+      Vehiculo(string m) : marca(m) {}
+      virtual string tipo() { return "Vehiculo"; }
+  };
+
+  class Auto : public Vehiculo {
+  public:
+      Auto(string m) : Vehiculo(m) {}
+      string tipo() override { return "Auto"; }
+  };
+
+  int main() {
+      Auto a("Toyota");
+      Vehiculo v = a;          // línea X
+
+      cout << v.tipo()  << endl;   // línea 1
+      cout << a.tipo()  << endl;   // línea 2
+      cout << v.marca   << endl;   // línea 3
+      return 0;
+  }
+
+  A) Auto / Auto / Toyota
+  B) Vehiculo / Auto / Toyota
+  C) Vehiculo / Vehiculo / Toyota
+  D) Error de compilación en línea X
+
+  Respuesta: C
+
+  ¿Cómo se llama el fenómeno que ocurre en la línea X?
+  ______________________________________________________________
+  ______________________________________________________________
+
+────────────────────────────────────────────────────────────────
+Q10. (3.5 pts) ¿Cuál de estas clases puede instanciarse
+     directamente con new?
+
+  class Figura {
+  public:
+      virtual double area() = 0;
+      virtual void imprimir() const = 0;
+      virtual ~Figura() {}
+  };
+
+  class Circulo : public Figura {
+      double radio;
+  public:
+      Circulo(double r) : radio(r) {}
+      double area() override { return 3.14 * radio * radio; }
+      void imprimir() const override {
+          cout << "Circulo r=" << radio << endl;
+      }
+  };
+
+  class Rectangulo : public Figura {
+      double ancho, alto;
+  public:
+      Rectangulo(double a, double b) : ancho(a), alto(b) {}
+      double area() override { return ancho * alto; }
+      // olvidó imprimir()
+  };
+
+  class Triangulo : public Figura {
+      double base, altura;
+  public:
+      Triangulo(double b, double h) : base(b), altura(h) {}
+      double area() override { return base * altura / 2; }
+      void imprimir() const override {
+          cout << "Triangulo" << endl;
+      }
+  };
+
+  A) Solo Figura
+  B) Circulo y Triangulo
+  C) Circulo, Rectangulo y Triangulo
+  D) Solo Circulo
+
+  Respuesta: D
+
+────────────────────────────────────────────────────────────────
+Q11. (3.5 pts) ¿Qué imprime este programa?
+
+  #include <iostream>
+  using namespace std;
+
+  class Logger {
+  public:
+      virtual void log(string msg) {
+          cout << "[LOG] " << msg << endl;
+      }
+      virtual ~Logger() {}
+  };
+
+  class LoggerFecha : public Logger {
+  public:
+      void log(string msg) override {
+          Logger::log(msg);
+          cout << "[FECHA] 2026" << endl;
+      }
+  };
+
+  int main() {
+      Logger* l = new LoggerFecha();
+      l->log("Inicio");
+      delete l;
+      return 0;
+  }
+
+  A) [LOG] Inicio
+  B) [LOG] Inicio / [FECHA] 2026
+  C) [FECHA] 2026 / [LOG] Inicio
+  D) Error — Logger::log() no puede llamarse desde override
+
+  Respuesta: B
+
+────────────────────────────────────────────────────────────────
+Q12. (3.5 pts) ¿Cuál es la salida COMPLETA de este programa,
+     incluyendo los destructores?
+
+  #include <iostream>
+  using namespace std;
+
+  class Base {
+  private:
+      int* datos;
+  public:
+      Base()  { datos = new int[5];
+                cout << "Base()" << endl; }
+      virtual ~Base() {
+          delete[] datos; datos = nullptr;
+          cout << "~Base()" << endl;
+      }
+  };
+
+  class Derivada : public Base {
+  private:
+      double* vals;
+  public:
+      Derivada()  { vals = new double[3];
+                    cout << "Derivada()" << endl; }
+      ~Derivada() {
+          delete[] vals; vals = nullptr;
+          cout << "~Derivada()" << endl;
+      }
+  };
+
+  int main() {
+      Base* obj = new Derivada();
+      delete obj;
+      return 0;
+  }
+
+  A) Base() / Derivada() / ~Base()
+  B) Base() / Derivada() / ~Derivada() / ~Base()
+  C) Base() / Derivada() / ~Derivada()
+  D) Derivada() / Base() / ~Base() / ~Derivada()
+
+  Respuesta: B
+
+────────────────────────────────────────────────────────────────
+Q13. (3.5 pts) ¿Cuál de los siguientes es un ejemplo de
+     UPCASTING válido e implícito en C++?
+
+  class Animal {
+  public:
+      virtual void hablar() {}
+      virtual ~Animal() {}
+  };
+  class Perro : public Animal {
+  public:
+      void ladrar() {}
+  };
+
+  Perro p;
+
+  A) Perro* ptr = (Perro*) new Animal();
+  B) Animal* a = &p;
+  C) Perro* q = dynamic_cast<Perro*>(&p);
+  D) Animal a = p;
+
+  Respuesta: A
+
+  ¿Por qué el upcasting es siempre seguro, a diferencia
+  del downcasting?
+Porque las clases hijas salen de los padres, y comparten sus atributos 
+
+────────────────────────────────────────────────────────────────
+Q14. (3.5 pts) Dado este código, ¿qué imprime el programa?
+
+  #include <iostream>
+  using namespace std;
+
+  class Empleado {
+  protected:
+      string nombre;
+  public:
+      Empleado(string n) : nombre(n) {}
+      virtual void trabajar() {
+          cout << nombre << ": trabajo generico" << endl;
+      }
+      virtual ~Empleado() {}
+  };
+
+  class Programador : public Empleado {
+  public:
+      Programador(string n) : Empleado(n) {}
+      void trabajar() override {
+          cout << nombre << ": escribe codigo" << endl;
+      }
+      void hackear() {
+          cout << nombre << ": modo hacker!" << endl;
+      }
+  };
+
+  class Disenador : public Empleado {
+  public:
+      Disenador(string n) : Empleado(n) {}
+      void trabajar() override {
+          cout << nombre << ": crea mockups" << endl;
+      }
+  };
+
+  int main() {
+      Empleado* equipo[2];
+      equipo[0] = new Programador("Ana");   // upcasting implícito
+      equipo[1] = new Disenador("Luis");    // upcasting implícito
+
+      for (int i = 0; i < 2; i++)
+          equipo[i]->trabajar();            // polimorfismo
+
+      // Downcasting:
+      Programador* p = dynamic_cast<Programador*>(equipo[0]);
+      Programador* q = dynamic_cast<Programador*>(equipo[1]);
+
+      if (p) p->hackear();
+      if (q) q->hackear();
+
+      delete equipo[0]; delete equipo[1];
+      return 0;
+  }
+
+  A) Ana: trabajo generico / Luis: trabajo generico /
+     Ana: modo hacker! / Luis: modo hacker!
+
+  B) Ana: escribe codigo / Luis: crea mockups /
+     Ana: modo hacker!
+
+  C) Ana: escribe codigo / Luis: crea mockups /
+     Ana: modo hacker! / Luis: modo hacker!
+
+  D) Error de compilación — equipo[0] es Empleado*,
+     no puede llamar hackear()
+
+  Respuesta: D
+
+╔══════════════════════════════════════════════════════════════╗
+║  PARTE 2 — IMPLEMENTACIÓN              (CON IDE)  51 pts   ║
+║  Abre el IDE cuando el profesor lo indique                  ║
+╚══════════════════════════════════════════════════════════════╝
+
+────────────────────────────────────────────────────────────────
+CONTEXTO:
+
+Estamos en el Mundial de Fútbol 2026. Cada selección tiene
+jugadores con distintos roles. Todos son jugadores, pero cada
+rol tiene comportamiento específico al momento de actuar.
+
+────────────────────────────────────────────────────────────────
+LO QUE DEBES IMPLEMENTAR:
+
+  1. Clase base abstracta Jugador:
+       Atributos (protected): string nombre, string pais
+       Constructor: Jugador(string nombre, string pais)
+       virtual string posicion() = 0
+       virtual void actuar() = 0
+       virtual void imprimir() const
+         → imprime: [pais] nombre — posicion()
+       virtual ~Jugador() {}
+
+  2. Clase Delantero (hija de Jugador):
+       Constructor: Delantero(string nombre, string pais)
+       string posicion() override → "Delantero"
+       void actuar() override
+         → imprime: nombre + " remata al arco!"
+
+  3. Clase Portero (hija de Jugador):
+       Constructor: Portero(string nombre, string pais)
+       string posicion() override → "Portero"
+       void actuar() override
+         → imprime: nombre + " ataja el disparo!"
+
+  4. Clase Mediocampista (hija de Jugador):
+       Constructor: Mediocampista(string nombre, string pais)
+       string posicion() override → "Mediocampista"
+       void actuar() override
+         → imprime: nombre + " da el pase clave!"
+
+  5. Main:
+       - Crea un arreglo Jugador* de 4 elementos en el stack
+       - Asigna con new: 1 Portero, 2 Delanteros, 1 Mediocampista
+       - Recorre el arreglo con un bucle y llama imprimir()
+         en cada elemento
+       - Recorre de nuevo y llama actuar() en cada elemento
+       - Libera la memoria con delete en cada elemento
+         y pone cada puntero a nullptr
+
+────────────────────────────────────────────────────────────────
+SALIDA ESPERADA (usa los nombres que quieras):
+
+  [Ecuador] Dominguez — Portero
+  [Ecuador] Enner — Delantero
+  [Ecuador] Plata — Delantero
+  [Ecuador] Caicedo — Mediocampista
+  Dominguez ataja el disparo!
+  Enner remata al arco!
+  Plata remata al arco!
+  Caicedo da el pase clave!
+
+────────────────────────────────────────────────────────────────
+CRITERIOS DE EVALUACIÓN (51 pts):
+
+  [ ] (10 pts) Clase Jugador: abstracta con = 0 en posicion()
+               y actuar(), imprimir() const correcto,
+               virtual ~Jugador() {}
+  [ ] (15 pts) Tres clases derivadas correctas — cada una con
+               constructor que llama Jugador(n, p),
+               override en posicion() y actuar()
+  [ ] (12 pts) Main: arreglo Jugador* correcto, new para cada
+               tipo, dos bucles polimórficos, delete + nullptr
+  [ ] (8 pts)  Polimorfismo real — imprimir() y actuar() deben
+               comportarse según el tipo real de cada objeto
+  [ ] (6 pts)  Programa compila sin errores y produce la
+               salida esperada
+
+================================================================
+FIN DEL QUIZ
+================================================================
