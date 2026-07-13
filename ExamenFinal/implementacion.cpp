@@ -60,11 +60,9 @@ int numero;
 public:
     Revista(const std::string& titulo, const std::string& autor, int anio, int numero) : Publicacion(titulo, autor, anio),numero(numero) {
     }
-
     int diasPrestamo() const override {
         return 7;
     }
-
     void imprimir() const override {
         Publicacion::imprimir();
         std::cout << "Numero: " << numero << '\n';
@@ -75,22 +73,22 @@ int main() {
 Publicacion* publicaciones[4];
 
 publicaciones[0] = new Libro(
-    "Cien anios de soledad",
-        "Gabriel Garcia Marquez",
-        1967,
+    "dias de soledad",
+        "jose luis araguren",
+        32131,
         471
     );
 
     publicaciones[1] = new Libro(
         "El principito",
-        "Antoine de Saint-Exupery",
+        "Antoine",
         1943,
         96
     );
 
     publicaciones[2] = new Revista(
-        "National Geographic",
-        "Varios autores",
+        "daddadas Geographic",
+        "Varios autdadores",
         2026,
         125
     );
@@ -101,14 +99,10 @@ publicaciones[0] = new Libro(
         2025,
         89
     );
-
-    std::cout << "CATALOGO DE PUBLICACIONES\n\n";
-
     for (int i = 0; i < 4; i++) {
         std::cout << *publicaciones[i];
-        std::cout << "-----------------------------\n";
-    }
 
+    }
     std::ofstream archivo("catalogo.txt");
 
     if (!archivo.is_open()) {
@@ -118,15 +112,12 @@ publicaciones[0] = new Libro(
             delete publicaciones[i];
             publicaciones[i] = nullptr;
         }
-
         return 1;
     }
 
     for (int i = 0; i < 4; i++) {
-        archivo << publicaciones[i]->getTitulo()
-                << " - "
-                << publicaciones[i]->diasPrestamo()
-                << " dias\n";
+        archivo << publicaciones[i]->getTitulo() << " - "
+                << publicaciones[i]->diasPrestamo() << " dias\n";
     }
 
     archivo.close();
