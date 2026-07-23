@@ -32,8 +32,8 @@ private:
     bool seHaMovido;
 
 public:
-    // Constructor de la piez
-    explicit Pieza(Color colorPieza);
+    // Constructor de la pieza
+    Pieza(Color colorPieza);
 
     // Es virtual porque el tablero borra piezas usando punteros Pieza*
     virtual ~Pieza();
